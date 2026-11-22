@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  browserLocalPersistence,
+  browserSessionPersistence,
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
@@ -42,7 +42,7 @@ export default function AuthProvider({ children }: Readonly<{ children: ReactNod
 
     async function initializeAuth() {
       try {
-        await setPersistence(auth, browserLocalPersistence);
+        await setPersistence(auth, browserSessionPersistence);
         if (!active) return;
 
         unsubscribe = onAuthStateChanged(

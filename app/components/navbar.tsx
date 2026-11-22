@@ -29,7 +29,7 @@ export default function Navbar({ onToggleMenu }: NavbarProps) {
     <header className="sticky top-0 z-30 border-b border-[#3D2D2E]/10 bg-[#3D2D2E]/50 text-[#3D2D2E] backdrop-blur">
       <div className="mx-auto flex h-[76px] max-w-[1600px] items-center justify-between px-5 sm:px-8">
         <div className="flex items-center gap-3">
-          <button onClick={onToggleMenu} className="rounded-lg p-2 hover:bg-[#e3eee3] lg:hidden" aria-label="Abrir menú"><Menu size={21} /></button>
+          <button onClick={onToggleMenu} className="rounded-lg p-2 hover:bg-[#e3eee3] xl:hidden" aria-label="Abrir menú"><Menu size={21} /></button>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ADEBB3]"><GraduationCap size={23} /></div>
           <div>
             <p className="text-[18px] font-bold tracking-tight">Verano<span className="font-normal">Admin</span></p>

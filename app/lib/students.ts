@@ -1,6 +1,5 @@
-import type { Student, StudentForm } from "../types/student";
+import type { StudentForm } from "../types/student";
 
-export const STORAGE_KEY = "summer-school-students-v1";
 export const WORKSHOPS = ["Arte", "Cocina", "Costura", "Boy Scout"];
 export const PAYMENT_THRESHOLD = 3.5;
 
@@ -46,17 +45,14 @@ export function capitalizeWords(value: string) {
   return value.replace(/(^|\s)\S/g, (character) => character.toUpperCase());
 }
 
-export const initialStudents: Student[] = [
-  { id: "1", childName: "Sofía Martínez", age: 8, location: "Centro", guardianName: "Carlos Martínez", enrolledBy: "Laura Pérez", shirtSize: "5-M", phoneNumber: "555-0101", multimediaAuthorized: true, amountPaid: "50", workshop: "Arte" },
-  { id: "2", childName: "Mateo Hernández", age: 9, location: "Norte", guardianName: "Ana Hernández", enrolledBy: "Laura Pérez", shirtSize: "10-S", phoneNumber: "555-0102", multimediaAuthorized: true, amountPaid: "50", workshop: "Boy Scout" },
-  { id: "3", childName: "Valentina López", age: 7, location: "Sur", guardianName: "José López", enrolledBy: "Marta Ruiz", shirtSize: "5-M", phoneNumber: "555-0103", multimediaAuthorized: false, amountPaid: "0", workshop: "Cocina" },
-  { id: "4", childName: "Sebastián Rivera", age: 10, location: "Centro", guardianName: "María Rivera", enrolledBy: "Laura Pérez", shirtSize: "10-S", phoneNumber: "555-0104", multimediaAuthorized: true, amountPaid: "50", workshop: "Costura" },
-  { id: "5", childName: "Isabella Flores", age: 8, location: "Este", guardianName: "Pedro Flores", enrolledBy: "Marta Ruiz", shirtSize: "5-M", phoneNumber: "555-0105", multimediaAuthorized: false, amountPaid: "0", workshop: "Cocina" },
-  { id: "6", childName: "Diego Ramírez", age: 11, location: "Norte", guardianName: "Laura Ramírez", enrolledBy: "Laura Pérez", shirtSize: "10-S", phoneNumber: "555-0106", multimediaAuthorized: true, amountPaid: "50", workshop: "Boy Scout" },
-  { id: "7", childName: "Camila Torres", age: 9, location: "Sur", guardianName: "Ricardo Torres", enrolledBy: "Marta Ruiz", shirtSize: "5-M", phoneNumber: "555-0107", multimediaAuthorized: true, amountPaid: "50", workshop: "Costura" },
-  { id: "8", childName: "Daniel García", age: 7, location: "Oeste", guardianName: "Patricia García", enrolledBy: "Laura Pérez", shirtSize: "5-M", phoneNumber: "555-0108", multimediaAuthorized: false, amountPaid: "0", workshop: "Arte" },
-  { id: "9", childName: "Luciana Cruz", age: 10, location: "Centro", guardianName: "Miguel Cruz", enrolledBy: "Marta Ruiz", shirtSize: "10-S", phoneNumber: "555-0109", multimediaAuthorized: true, amountPaid: "50", workshop: "Cocina" },
-  { id: "10", childName: "Gabriel Reyes", age: 8, location: "Este", guardianName: "Elena Reyes", enrolledBy: "Laura Pérez", shirtSize: "5-M", phoneNumber: "555-0110", multimediaAuthorized: true, amountPaid: "50", workshop: "Costura" },
-  { id: "11", childName: "Emma Aguilar", age: 6, location: "Norte", guardianName: "Francisco Aguilar", enrolledBy: "Marta Ruiz", shirtSize: "10-S", phoneNumber: "555-0111", multimediaAuthorized: false, amountPaid: "0", workshop: "Arte" },
-  { id: "12", childName: "Nicolás Castro", age: 9, location: "Sur", guardianName: "Verónica Castro", enrolledBy: "Laura Pérez", shirtSize: "5-M", phoneNumber: "555-0112", multimediaAuthorized: true, amountPaid: "50", workshop: "Boy Scout" }
-];
+export function hasTwoMatchingNameParts(firstName: string, secondName: string) {
+  const firstParts = new Set(firstName.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean));
+  const secondParts = new Set(secondName.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean));
+  let matches = 0;
+
+  for (const part of firstParts) {
+    if (secondParts.has(part) && ++matches >= 2) return true;
+  }
+
+  return false;
+}

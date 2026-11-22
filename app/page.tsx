@@ -3,6 +3,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Plus } from "lucide-react";
+import DeleteConfirmationModal from "./components/delete-confirmation-modal";
+import DuplicateEnrollmentModal from "./components/duplicate-enrollment-modal";
 import EnrollmentModal from "./components/enrollment-modal";
 import Navbar from "./components/navbar";
 import Pagination from "./components/pagination";
@@ -13,6 +15,7 @@ import {
   createEmptyStudentForm,
   formatAmount,
   getPaymentAmount,
+  hasTwoMatchingNameParts,
   isPaymentComplete,
   PAYMENT_THRESHOLD,
   WORKSHOPS,
@@ -35,6 +38,9 @@ export default function Home() {
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Student | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [duplicateStudentName, setDuplicateStudentName] = useState<string | null>(null);
   const [mobileNav, setMobileNav] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [form, setForm] = useState<StudentForm>(createEmptyStudentForm);
@@ -116,78 +122,97 @@ export default function Home() {
   }
 
   async function saveStudent(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  const childName = form.childName.trim();
-  const location = form.location.trim();
-  const guardianName = form.guardianName.trim();
-  const enrolledBy = form.enrolledBy.trim();
-  const shirtSize = form.shirtSize.trim();
-  const phoneNumber = form.phoneNumber.replace(/\D/g, "").slice(0, 8);
-  const gender = form.gender;
-
-  if (
-    !childName ||
-    (gender !== "M" && gender !== "F") ||
-    !location ||
-    !guardianName ||
-    !enrolledBy ||
-    !shirtSize ||
-    !phoneNumber ||
-    form.age === ""
-  ) {
-    return;
+    event.preventDefault();
+    await saveStudentData(false);
   }
 
-  const studentData = {
-    ...form,
-    gender,
-    childName,
-    age: Number(form.age),
-    location,
-    guardianName,
-    enrolledBy,
-    shirtSize,
-    phoneNumber,
-    amountPaid: formatAmount(form.amountPaid),
-  };
+  async function saveStudentData(allowDuplicate: boolean) {
+    const childName = form.childName.trim();
+    const location = form.location.trim();
+    const guardianName = form.guardianName.trim();
+    const enrolledBy = form.enrolledBy.trim();
+    const shirtSize = form.shirtSize.trim();
+    const phoneNumber = form.phoneNumber.replace(/\D/g, "").slice(0, 8);
+    const gender = form.gender;
 
-  try {
-    if (editing) {
-      await updateStudent(editing.id, studentData);
-    } else {
-      await createStudent(studentData);
-      setPage(1);
+    if (
+      !childName ||
+      (gender !== "M" && gender !== "F") ||
+      !location ||
+      !guardianName ||
+      !enrolledBy ||
+      !shirtSize ||
+      !phoneNumber ||
+      form.age === ""
+    ) {
+      return false;
     }
 
-    setModalOpen(false);
-  } catch (error) {
-    console.error("Error al guardar estudiante:", error);
-    window.alert("No se pudo guardar la inscripción en Firebase.");
+    if (!editing && !allowDuplicate) {
+      const duplicate = students.find(
+        (student) => hasTwoMatchingNameParts(student.childName, childName)
+      );
+      if (duplicate) {
+        setDuplicateStudentName(duplicate.childName);
+        return false;
+      }
+    }
+
+    const studentData = {
+      ...form,
+      gender,
+      childName,
+      age: Number(form.age),
+      location,
+      guardianName,
+      enrolledBy,
+      shirtSize,
+      phoneNumber,
+      amountPaid: formatAmount(form.amountPaid),
+    };
+
+    try {
+      if (editing) {
+        await updateStudent(editing.id, studentData);
+      } else {
+        await createStudent(studentData);
+        setPage(1);
+      }
+
+      setModalOpen(false);
+      setDuplicateStudentName(null);
+      return true;
+    } catch (error) {
+      console.error("Error al guardar estudiante:", error);
+      window.alert("No se pudo guardar la inscripción en Firebase.");
+      return false;
+    }
   }
-}
+
+  async function confirmDuplicateEnrollment() {
+    await saveStudentData(true);
+  }
 
 function deleteStudent(student: Student) {
-  if (
-    window.confirm(
-      `¿Seguro que deseas eliminar la inscripción de ${student.childName}?`
-    )
-  ) {
-    deleteStudentFromFirebase(student.id)
-      .then(() => {
-        setExpandedStudentId((current) =>
-          current === student.id ? null : current
-        );
-      })
-      .catch((error) => {
-        console.error("Error al eliminar estudiante:", error);
-        window.alert("No se pudo eliminar la inscripción de Firebase.");
-      });
+  setStudentToDelete(student);
+}
 
-    return true;
+async function confirmDeleteStudent() {
+  if (!studentToDelete || deleting) return;
+
+  setDeleting(true);
+  try {
+    await deleteStudentFromFirebase(studentToDelete.id);
+    setExpandedStudentId((current) =>
+      current === studentToDelete.id ? null : current
+    );
+    setStudentToDelete(null);
+  } catch (error) {
+    console.error("Error al eliminar estudiante:", error);
+    window.alert("No se pudo eliminar la inscripción de Firebase.");
+  } finally {
+    setDeleting(false);
   }
-
-  return false;
 }
 
   return (
@@ -203,9 +228,9 @@ function deleteStudent(student: Student) {
           onToggleCollapsed={() => setSidebarCollapsed((collapsed) => !collapsed)}
         />
 
-        <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+        <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-6 lg:py-10 xl:px-10">
           <div className="mx-auto max-w-[1180px]">
-            <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div>
                 <p className="mb-2 flex items-center gap-2 text-xs font-medium text-[#8d8182]"><CalendarDays size={14} /> ESCUELA DE VERANO / 2026</p>
                 <h1 className="text-3xl font-bold tracking-tight sm:text-[34px]">Inscripciones</h1>
@@ -254,13 +279,33 @@ function deleteStudent(student: Student) {
         </main>
       </div>
 
-      {modalOpen && (
+      {modalOpen && !duplicateStudentName && (
         <EnrollmentModal
           form={form}
           editing={editing}
           onFormChange={setForm}
           onSubmit={saveStudent}
           onClose={() => setModalOpen(false)}
+        />
+      )}
+      {modalOpen && duplicateStudentName && (
+        <DuplicateEnrollmentModal
+          studentName={duplicateStudentName}
+          onConfirm={confirmDuplicateEnrollment}
+          onCancel={() => {
+            setDuplicateStudentName(null);
+            setModalOpen(false);
+          }}
+        />
+      )}
+      {studentToDelete && (
+        <DeleteConfirmationModal
+          student={studentToDelete}
+          deleting={deleting}
+          onConfirm={confirmDeleteStudent}
+          onClose={() => {
+            if (!deleting) setStudentToDelete(null);
+          }}
         />
       )}
     </div>

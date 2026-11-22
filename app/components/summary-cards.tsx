@@ -13,7 +13,7 @@ type SummaryCardsProps = {
 
 export default function SummaryCards({ studentCount, maleCount, femaleCount, paid, partial, none, sizes, workshops }: SummaryCardsProps) {
   return (
-    <div className="mx-auto mb-7 grid max-w-[920px] gap-4 sm:grid-cols-2">
+    <div className="mx-auto mb-7 grid max-w-[920px] gap-4 md:grid-cols-2">
       <EnrollmentSummaryCard total={studentCount} maleCount={maleCount} femaleCount={femaleCount} />
       <PaymentSummaryCard paid={paid} partial={partial} none={none} />
       <ShirtSummaryCard sizes={sizes} />

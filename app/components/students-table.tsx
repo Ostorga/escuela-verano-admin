@@ -15,7 +15,7 @@ type StudentsTableProps = {
   onPaymentFilterChange: (value: string) => void;
   onToggleExpanded: (studentId: string) => void;
   onEdit: (student: Student) => void;
-  onDelete: (student: Student) => boolean;
+  onDelete: (student: Student) => void;
 };
 
 export default function StudentsTable({
@@ -62,10 +62,10 @@ export default function StudentsTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto py-3 2xl:overflow-visible">
-        <table className="w-full min-w-[1020px] border-collapse text-left">
+      <div className="max-w-full overflow-x-auto py-3">
+        <table className="w-full min-w-[960px] border-collapse text-left">
           <thead>
-            <tr className="bg-[#e6ebe6] text-[11px] font-extrabold uppercase tracking-[.12em] text-[#554445]">
+            <tr className="whitespace-nowrap bg-[#e6ebe6] text-[11px] font-extrabold uppercase tracking-[.12em] text-[#554445]">
               <th className="px-6 py-4 font-extrabold">Nombre del alumno</th>
               <th className="px-5 py-4 font-extrabold">Edad</th>
               <th className="px-5 py-4 font-extrabold">Ubicación</th>
@@ -78,19 +78,19 @@ export default function StudentsTable({
           {students.map((student, index) => (
             <tbody
               key={student.id}
-              className={`border-b border-[#dfe5df] transition-all duration-200 ease-out ${expandedStudentId === student.id ? "relative z-10 scale-[1.015] shadow-[0_0_16px_2px_rgba(45,65,45,0.2)]" : ""}`}
+              className={`border-b border-[#dfe5df] transition-shadow duration-200 ease-out ${expandedStudentId === student.id ? "relative z-10 shadow-[0_0_16px_2px_rgba(45,65,45,0.2)]" : ""}`}
             >
               <tr className={`transition-colors duration-200 ${index % 2 === 0 ? "bg-white hover:bg-[#fafcfa]" : "bg-[#f3f6f3] hover:bg-[#edf2ed]"}`}>
-                <td className="px-6 py-[17px]">
+                <td className="whitespace-nowrap px-6 py-[17px]">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ADEBB3]/45 text-xs font-bold text-[#3D2D2E]">{student.childName.split(" ").map((part) => part[0]).slice(0, 2).join("").toUpperCase()}</div>
                     <span className="text-[13px] font-semibold">{student.childName}</span>
                   </div>
                 </td>
-                <td className="px-5 py-[17px] text-sm text-[#776d6e]">{student.age || "—"}</td>
-                <td className="px-5 py-[17px] text-sm text-[#776d6e]">{student.location}</td>
-                <td className="px-5 py-[17px]"><span className="rounded-lg bg-[#f5f7f5] px-2.5 py-1.5 text-xs font-medium text-[#665b5c]">{student.workshop}</span></td>
-                <td className="px-5 py-[17px]">
+                <td className="whitespace-nowrap px-5 py-[17px] text-sm text-[#776d6e]">{student.age || "—"}</td>
+                <td className="whitespace-nowrap px-5 py-[17px] text-sm text-[#776d6e]">{student.location}</td>
+                <td className="whitespace-nowrap px-5 py-[17px]"><span className="rounded-lg bg-[#f5f7f5] px-2.5 py-1.5 text-xs font-medium text-[#665b5c]">{student.workshop}</span></td>
+                <td className="whitespace-nowrap px-5 py-[17px]">
                   <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-bold ${isPaymentComplete(student.amountPaid) ? "bg-[#e9f8eb] text-[#398247]" : "bg-[#fff4e5] text-[#a66b1e]"}`}>
                     ${student.amountPaid || "0.00"}
                   </span>
@@ -110,7 +110,7 @@ export default function StudentsTable({
                   {activeMenu === student.id && (
                     <div ref={menuRef} className="absolute right-8 top-[52px] z-20 w-36 rounded-xl border border-[#e9ece9] bg-white p-1.5 text-left shadow-[0_10px_35px_rgba(30,30,30,.13)]">
                       <button onClick={() => { setActiveMenu(null); onEdit(student); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-xs hover:bg-[#e5efe5]"><Pencil size={14} /> Editar</button>
-                      <button onClick={() => { if (onDelete(student)) setActiveMenu(null); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-xs text-[#c34d4d] hover:bg-[#ffdddd]"><Trash2 size={14} /> Eliminar</button>
+                      <button onClick={() => { setActiveMenu(null); onDelete(student); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-xs text-[#c34d4d] hover:bg-[#ffdddd]"><Trash2 size={14} /> Eliminar</button>
                     </div>
                   )}
                 </td>
@@ -118,7 +118,7 @@ export default function StudentsTable({
               {expandedStudentId === student.id && (
                 <tr className={index % 2 === 0 ? "bg-white" : "bg-[#f3f6f3]"}>
                   <td colSpan={7} className="border-t border-[#dfe5df] px-6 py-4">
-                    <div className={`grid gap-4 rounded-xl px-3 py-2 sm:grid-cols-2 lg:grid-cols-4 ${index % 2 === 0 ? "bg-white" : "bg-[#f3f6f3]"}`}>
+                    <div className={`grid grid-cols-5 gap-4 rounded-xl px-3 py-2 ${index % 2 === 0 ? "bg-white" : "bg-[#f3f6f3]"}`}>
                       <DetailItem label="Encargado" value={student.guardianName} />
                       <DetailItem label="Inscrito por" value={student.enrolledBy} />
                       <DetailItem label="Talla" value={student.shirtSize} />
