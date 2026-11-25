@@ -28,8 +28,22 @@ export default function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-      <div className="w-full max-w-[440px]">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-10 sm:px-6">
+      <div className="grid w-full max-w-5xl items-center justify-center gap-10 lg:grid-cols-[minmax(300px,0.85fr)_440px] lg:gap-16">
+        <aside className="hidden items-center justify-center lg:flex" aria-hidden="true">
+          <div className="relative aspect-video w-full max-w-[420px] overflow-hidden bg-[#f7f1e6] lg:max-w-[500px]">
+            <video
+              src="/images/login-background.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 block h-full w-full object-cover [transform:translateZ(0)]"
+            />
+          </div>
+        </aside>
+
+      <div className="w-full max-w-[440px] justify-self-center">
         <div className="mb-7 flex flex-col items-center text-center">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ADEBB3] text-[#3D2D2E]">
             <GraduationCap size={27} />
@@ -123,6 +137,7 @@ export default function LoginForm() {
         <p className="mt-5 text-center text-xs text-[#aaa1a1]">
           Acceso exclusivo para administración
         </p>
+      </div>
       </div>
     </main>
   );

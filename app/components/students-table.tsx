@@ -62,7 +62,7 @@ export default function StudentsTable({
         </div>
       </div>
 
-      <div className="max-w-full overflow-x-auto py-3">
+      <div className="max-w-full overflow-x-auto py-3 2xl:overflow-visible">
         <table className="w-full min-w-[960px] border-collapse text-left">
           <thead>
             <tr className="whitespace-nowrap bg-[#e6ebe6] text-[11px] font-extrabold uppercase tracking-[.12em] text-[#554445]">
@@ -78,7 +78,7 @@ export default function StudentsTable({
           {students.map((student, index) => (
             <tbody
               key={student.id}
-              className={`border-b border-[#dfe5df] transition-shadow duration-200 ease-out ${expandedStudentId === student.id ? "relative z-10 shadow-[0_0_16px_2px_rgba(45,65,45,0.2)]" : ""}`}
+              className={`border-b border-[#dfe5df] transition-all duration-200 ease-out ${expandedStudentId === student.id ? "relative z-10 scale-[1.015] shadow-[0_0_16px_2px_rgba(45,65,45,0.2)]" : ""}`}
             >
               <tr className={`transition-colors duration-200 ${index % 2 === 0 ? "bg-white hover:bg-[#fafcfa]" : "bg-[#f3f6f3] hover:bg-[#edf2ed]"}`}>
                 <td className="whitespace-nowrap px-6 py-[17px]">

@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #ADEBB3;
-  --secondary: #3D2D2E;
-  --page: #f6f8f6;
+  --primary: #8F3F00;
+  --secondary: #66402C;
+  --page: #f7f1e6;
 }
 
 * { box-sizing: border-box; }
@@ -33,3 +33,6 @@ button { cursor: pointer; }
 }
 .form-input:focus { border-color: #83d58e; }
 .form-input::placeholder { color: #aaa1a1; }
+
+/* El fondo blanco original del PNG se mezcla con el color de la página,
+   dejando visible únicamente la ilustración. */
