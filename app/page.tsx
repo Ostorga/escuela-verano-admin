@@ -255,6 +255,7 @@ async function confirmDeleteStudent() {
             <section className="overflow-visible rounded-2xl border border-[#dfe5df] bg-white shadow-[0_8px_30px_rgba(45,65,45,0.09)]">
               <StudentsTable
                 students={visibleStudents}
+                exportStudents={filtered}
                 filteredCount={filtered.length}
                 search={search}
                 paymentFilter={paymentFilter}

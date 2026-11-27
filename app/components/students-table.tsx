@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Filter, MoreHorizontal, Pencil, Search, Trash2 } from "lucide-react";
+import { ChevronDown, Download, FileSpreadsheet, FileText, Filter, MoreHorizontal, Pencil, Search, Trash2 } from "lucide-react";
 import { isPaymentComplete } from "../lib/students";
 import type { Student } from "../types/student";
+import { exportarExcel, exportarPDF } from "../utils/exportar";
 
 type StudentsTableProps = {
   students: Student[];
+  exportStudents: Student[];
   filteredCount: number;
   search: string;
   paymentFilter: string;
@@ -20,6 +22,7 @@ type StudentsTableProps = {
 
 export default function StudentsTable({
   students,
+  exportStudents,
   filteredCount,
   search,
   paymentFilter,
@@ -31,11 +34,15 @@ export default function StudentsTable({
   onDelete
 }: StudentsTableProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const close = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setActiveMenu(null);
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenu(null);
+        setExportMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
@@ -48,7 +55,7 @@ export default function StudentsTable({
           <h2 className="font-bold">Lista de niños</h2>
           <p className="mt-1 text-xs text-[#94898a]">{filteredCount} {filteredCount === 1 ? "registro encontrado" : "registros encontrados"}</p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div ref={menuRef} className="flex flex-col gap-2 sm:flex-row">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9091]" />
             <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder="Buscar alumno..." className="h-10 w-full rounded-xl border border-[#e8ece8] bg-white pl-9 pr-3 text-xs outline-none transition placeholder:text-[#aaa1a1] focus:border-[#83d58e] sm:w-[230px]" />
@@ -58,6 +65,23 @@ export default function StudentsTable({
             <select value={paymentFilter} onChange={(event) => onPaymentFilterChange(event.target.value)} className="h-10 w-full appearance-none rounded-xl border border-[#e8ece8] bg-white pl-9 pr-8 text-xs outline-none focus:border-[#83d58e] sm:w-[155px]">
               <option value="all">Todos los pagos</option><option value="paid">Pagado</option><option value="unpaid">Pendiente</option>
             </select>
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setExportMenuOpen((open) => !open)}
+              disabled={exportStudents.length === 0}
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#d8e4d8] bg-[#f5faf5] px-3 text-xs font-semibold text-[#3d6b43] transition hover:bg-[#e7f3e7] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              aria-expanded={exportMenuOpen}
+            >
+              <Download size={15} /> Descargar
+            </button>
+            {exportMenuOpen && (
+              <div className="absolute right-0 top-11 z-30 w-48 rounded-xl border border-[#e9ece9] bg-white p-1.5 shadow-[0_10px_35px_rgba(30,30,30,.13)]">
+                <button onClick={() => { void exportarPDF(exportStudents); setExportMenuOpen(false); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs hover:bg-[#e5efe5]"><FileText size={15} className="text-[#c54f4f]" /> Descargar PDF</button>
+                <button onClick={() => { void exportarExcel(exportStudents); setExportMenuOpen(false); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs hover:bg-[#e5efe5]"><FileSpreadsheet size={15} className="text-[#398247]" /> Descargar Excel</button>
+              </div>
+            )}
           </div>
         </div>
       </div>
